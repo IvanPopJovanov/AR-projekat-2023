@@ -1,20 +1,33 @@
-// AR-projekat-2023.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
 #include <iostream>
+
+#include "Rewrite.h"
+
+TermPtr S(TermPtr t) {
+    return Fun("S", { t });
+}
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    TermPtr x = Var("x");
+    TermPtr y = Var("y");
+    TermPtr zero = Fun("0", {});
+    RewriteSystem R;
+    R.eqs.push_back(Equality{ Fun("+", {zero, x}), 
+                              x 
+    });
+    R.eqs.push_back(Equality{ Fun("+", { S(x), y }),
+                              S(Fun("+", { x, y }))
+    });
+    R.eqs.push_back(Equality{ Fun("*", { zero, x }), 
+                              zero 
+    });
+    R.eqs.push_back(Equality{ Fun("*", { S(x), y}),
+                              Fun("+", { y, Fun("*", { x, y })})
+    });
+
+    TermPtr t = Fun("+", { Fun("*", { S(S(S(zero))), S(S(zero))}), S(S(S(S(zero)))) });
+
+    print(t); cout << endl;
+
+    print(R.rewrite(t)); cout << endl;
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
