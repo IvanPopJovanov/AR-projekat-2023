@@ -5,7 +5,10 @@ TermPtr Substitution::substitute(TermPtr t)
     switch (t->type)
     {
     case Term::Variable:
-        return subs.at(t->variable);
+        if (subs.find(t->variable) != subs.end()) // TODO: Mislim da ovo moze bolje...
+            return subs.at(t->variable);
+        else
+            return t;
     case Term::Function: {
         vector<TermPtr> args;
         for (auto arg : t->function.args) {
