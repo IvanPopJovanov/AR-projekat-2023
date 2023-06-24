@@ -26,6 +26,8 @@ struct Term {
 		FunctionData function;
 	};
 
+	bool contains(string var);
+
 	Term(VariableData d) : type(Variable), variable(d) {};
 	Term(FunctionData d) : type(Function), function(d) {};
 	~Term() {

@@ -30,6 +30,9 @@
     <ClCompile Include="Substitution.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LPO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Term.h">
@@ -42,6 +45,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Substitution.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LPO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

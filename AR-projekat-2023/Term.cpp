@@ -29,6 +29,18 @@ bool equals(TermPtr l, TermPtr r)
 	}
 }
 
+bool Term::contains(string var)
+{
+	if (type == Variable) {
+		return variable == var;
+	}
+	for (auto arg : function.args) {
+		if (arg->contains(var))
+			return true;
+	}
+	return false;
+}
+
 void print(TermPtr t)
 {
 	switch (t->type) {
@@ -49,3 +61,4 @@ void print(TermPtr t)
 		break;
 	}
 }
+

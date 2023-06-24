@@ -128,6 +128,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Equality.cpp" />
+    <ClCompile Include="LPO.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Rewrite.cpp" />
     <ClCompile Include="Substitution.cpp" />
@@ -135,6 +136,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Equality.h" />
+    <ClInclude Include="LPO.h" />
     <ClInclude Include="Rewrite.h" />
     <ClInclude Include="Substitution.h" />
     <ClInclude Include="Term.h" />
