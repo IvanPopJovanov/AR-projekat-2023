@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <set>
 #include <memory>
 
 using namespace std;
@@ -27,6 +28,7 @@ struct Term {
 	};
 
 	bool contains(string var);
+	void getVars(set<string>& vars);
 
 	Term(VariableData d) : type(Variable), variable(d) {};
 	Term(FunctionData d) : type(Function), function(d) {};

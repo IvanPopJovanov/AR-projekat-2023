@@ -33,6 +33,9 @@
     <ClCompile Include="LPO.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Completion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Term.h">
@@ -48,6 +51,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LPO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Completion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

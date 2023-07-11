@@ -41,6 +41,24 @@ bool Term::contains(string var)
 	return false;
 }
 
+void Term::getVars(set<string>& vars)
+{
+	switch (type)
+	{
+	case Term::Variable:
+		vars.insert(variable);
+		break;
+	case Term::Function:
+		for (auto arg : function.args) {
+			arg->getVars(vars);
+		}
+		break;
+	default:
+		break;
+	}
+
+}
+
 void print(TermPtr t)
 {
 	switch (t->type) {
