@@ -6,5 +6,5 @@
 
 using TermPairs = std::vector< std::pair<TermPtr, TermPtr> >;
 
-std::optional<Substitution> unify(const TermPairs& pairs);
-std::optional<Substitution> unify(FormulaPtr a1, FormulaPtr a2);
+bool unify(const TermPairs& pairs, Substitution& s);
+bool unify(TermPtr a1, TermPtr a2, Substitution& s);
