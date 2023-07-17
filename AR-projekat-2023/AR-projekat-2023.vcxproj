@@ -134,6 +134,7 @@
     <ClCompile Include="Rewrite.cpp" />
     <ClCompile Include="Substitution.cpp" />
     <ClCompile Include="Term.cpp" />
+    <ClCompile Include="Unification.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Completion.h" />
@@ -142,6 +143,7 @@
     <ClInclude Include="Rewrite.h" />
     <ClInclude Include="Substitution.h" />
     <ClInclude Include="Term.h" />
+    <ClInclude Include="Unification.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

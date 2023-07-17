@@ -36,6 +36,9 @@
     <ClCompile Include="Completion.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Unification.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Term.h">
@@ -54,6 +57,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Completion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Unification.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
