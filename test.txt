@@ -1,0 +1,7 @@
+4
+plus(zero,X) = X;
+plus(s(X),Y) = s(plus(X,Y));
+times(zero,X) = zero;
+times(s(X),Y) = plus(Y, times(X,Y));
+
+term(plus(times(s(s(s(zero))), s(s(zero))), s(s(s(s(zero))))));
