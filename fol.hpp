@@ -42,8 +42,6 @@ public:
   {
     throw "Not implemented";
   }
-
-  
   
   virtual ~BaseTerm() {}
 };
@@ -1060,5 +1058,8 @@ public:
 };
 
 extern Formula parsed_formula;
+
+
+bool contains(Term t, string var);
 
 #endif // _FOL_H
