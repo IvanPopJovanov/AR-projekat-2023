@@ -1436,7 +1436,7 @@ yyerrlab:
   if (!yyerrstatus)
     {
       ++yynerrs;
-      yyerror (YY_("syntax error"));
+      // yyerror (YY_("syntax error"));
     }
 
   if (yyerrstatus == 3)

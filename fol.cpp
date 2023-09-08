@@ -10,7 +10,7 @@ bool contains(Term t, string var)
 		return t->getVariable() == var;
 	}
 	for (auto arg : t->getOperands()) {
-		if (contains(t, var))
+		if (contains(arg, var))
 			return true;
 	}
 	return false;

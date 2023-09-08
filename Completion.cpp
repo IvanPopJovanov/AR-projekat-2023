@@ -1,5 +1,9 @@
 #include "Completion.h"
+#include "Rewrite.h"
+#include "LPO.h"
 #include <set>
+#include <queue>
+#include <list>
 
 void getVars(Term t, set<string>& vars)
 {
@@ -44,34 +48,160 @@ void renamePair(Formula & fm1, Formula & fm2)
 
 }
 
-void overlaps(Term l1, Term l2, std::vector<Substitution>& substitutions)
+void overlaps(Term l1, Term l2, Term r2, std::vector<Substitution>& substitutions, std::vector<Term>& l1_cases)
 {
 	if (l1->getType() == BaseTerm::TT_VARIABLE)
 		return;
 
 	Substitution s;
-	if (unify(l1, l2, s))
+	if (unify(l1, l2, s)) {
 		substitutions.push_back(s);
+		l1_cases.push_back(r2);
+	}
 
-	for (auto arg : l1->getOperands()) {
-		overlaps(arg, l2, substitutions);
+	for (int i = 0; i < l1->getOperands().size(); i++) {
+		std::vector<Term> cases;
+		overlaps(l1->getOperands()[i], l2, r2, substitutions, cases);
+		for(auto t : cases) {
+			auto args = l1->getOperands();
+			args[i] = t;
+			l1_cases.push_back(TermDatabase::getTermDatabase().makeFunctionTerm(l1->getSymbol(), args));
+		}
 	}
 }
 
-vector<CriticalPair> criticalPairs(Equality eq1, Equality eq2)
+vector<CriticalPair*> criticalPairs(Formula eq1, Formula eq2)
 {
+	bool same = (eq1 == eq2);
+	renamePair(eq1, eq2);
+
+	vector<CriticalPair*> cps;
+
+	auto l1 = eq1->getLeftOperand();
+	auto r1 = eq1->getRightOperand();
+	auto l2 = eq2->getLeftOperand();
+	auto r2 = eq2->getRightOperand();
+
 	vector<Substitution> substitutions;
-	overlaps(eq1.getLeftOperand(), eq2.getLeftOperand(), substitutions);
+	vector<Term> l1_cases;
+	overlaps(l1, l2, r2, substitutions, l1_cases);
+	for (int i = 0; i < substitutions.size(); i++) {
+		auto s = substitutions[i];
 
-	vector<CriticalPair> cps;
-	for (auto s : substitutions) {
-		auto l1 = s.substitute(eq1.getLeftOperand());
-		auto r1 = s.substitute(eq1.getRightOperand());
-		auto l2 = s.substitute(eq2.getLeftOperand());
-		auto r2 = s.substitute(eq2.getRightOperand());
+		CriticalPair *cp = new CriticalPair(s.substitute(r1), s.substitute(l1_cases[i]));
+		cps.push_back(cp);
+	}
 
+	if(!same) {
+		auto l1 = eq2->getLeftOperand();
+		auto r1 = eq2->getRightOperand();
+		auto l2 = eq1->getLeftOperand();
+		auto r2 = eq1->getRightOperand();
 
+		vector<Substitution> substitutions;
+		vector<Term> l1_cases;
+		overlaps(l1, l2, r2, substitutions, l1_cases);
+		for (int i = 0; i < substitutions.size(); i++) {
+			auto s = substitutions[i];
+
+			CriticalPair *cp = new CriticalPair(s.substitute(r1), s.substitute(l1_cases[i]));
+			cps.push_back(cp);
+		}
 	}
 
 	return cps;
+}
+
+void KnuthBendix(vector<Formula>& eqs) {
+	vector<string> w = { "one", "times", "i" };
+	list<CriticalPair*> def;
+	queue<CriticalPair*> cps;
+
+	cout << eqs.size() << " equations, " << cps.size() << " critical pairs, " << def.size() << " deffered" << endl;
+
+	for(int i = 0; i < eqs.size(); i++) {
+		if(LPO_ge(eqs[i]->getRightOperand(), eqs[i]->getLeftOperand(), w)) {
+			eqs[i] = FormulaDatabase::getFormulaDatabase().makeEquality(eqs[i]->getRightOperand(), eqs[i]->getLeftOperand());
+		}
+	}
+
+	for(int i = 0; i < eqs.size(); i++) {
+		for(int j = i; j < eqs.size(); j++) {
+			auto tcps = criticalPairs(eqs[i], eqs[j]);
+			for(auto cp : tcps) 
+				cps.push(cp);
+		}
+	}
+
+	int maxi = 10;
+	while(!def.empty() || !cps.empty()) {
+		cout << eqs.size() << " equations, " << cps.size() << " critical pairs, " << def.size() << " deffered" << endl;
+		if(!cps.empty()){
+			auto cp = cps.front();
+			cps.pop();
+			auto u1 = cp->l;
+			auto u2 = cp->r;
+
+			cout << u1 << " #1# " << u2 << endl;
+			RewriteSystem R;
+			R.eqs = eqs;
+			u1 = R.rewrite(u1);
+			u2 = R.rewrite(u2);
+			cout << u1 << " #2# " << u2 << endl;
+			if(u1 == u2)
+				continue;
+
+			Formula eq;
+			if(LPO_gt(u1, u2, w))
+				eq = FormulaDatabase::getFormulaDatabase().makeEquality(u1,u2);
+			else if(LPO_gt(u2, u1, w))
+				eq = FormulaDatabase::getFormulaDatabase().makeEquality(u2,u1);
+			else {
+				def.push_back(cp);
+				continue;
+			}
+
+			// cout << eq << endl;
+			eqs.push_back(eq);
+
+			for(int i = 0; i < eqs.size(); i++) {
+				auto tcps = criticalPairs(eqs[i], eq);
+				for(auto cp : tcps) {
+					// cout << cp->l << " ### " << cp->r << endl;	
+					cps.push(cp);
+				}
+			}
+		} else {
+			for(auto it=def.begin(); it!=def.end(); ) {
+				auto cp = *it;
+				auto u1 = cp->l;
+				auto u2 = cp->r;
+
+				RewriteSystem R;
+				R.eqs = eqs;
+				u1 = R.rewrite(u1);
+				u2 = R.rewrite(u2);
+				if(u1 == u2)
+					continue;
+
+				Formula eq;
+				if(LPO_gt(u1, u2, w))
+					eq = FormulaDatabase::getFormulaDatabase().makeEquality(u1,u2);
+				else if(LPO_gt(u2, u1, w))
+					eq = FormulaDatabase::getFormulaDatabase().makeEquality(u2,u1);
+				else {
+					++it;
+					continue;
+				}
+				
+				it = def.erase(it);
+				cps.push(cp);
+			}
+		}
+
+		if(--maxi <= 0)
+			break;
+	}
+	
+	cout << eqs.size() << " equations, " << cps.size() << " critical pairs, " << def.size() << " deffered" << endl;
 }

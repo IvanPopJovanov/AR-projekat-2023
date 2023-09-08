@@ -1,6 +1,7 @@
 #include "Unification.h"
 
 bool factorization(TermPairs& pairs) {
+    // cout << "factorization" << endl;
     bool change = false;
     for (unsigned i = 0; i < pairs.size(); i++) {
         unsigned j = i + 1;
@@ -18,6 +19,7 @@ bool factorization(TermPairs& pairs) {
 }
 
 bool tautology(TermPairs& pairs) {
+    // cout << "tautology" << endl;
     bool change = false;
     unsigned i = 0;
     while (i < pairs.size()) {
@@ -32,6 +34,7 @@ bool tautology(TermPairs& pairs) {
 }
 
 bool orientation(TermPairs& pairs) {
+    // cout << "orientation" << endl;
     bool change = false;
     for (auto& tv : pairs)
         if (tv.first->getType() == BaseTerm::TT_FUNCTION &&
@@ -44,22 +47,24 @@ bool orientation(TermPairs& pairs) {
 }
 
 bool decomposition(TermPairs& pairs, bool& collision) {
+    // cout << "decomposition" << endl;
     bool change = false;
     unsigned i = 0;
     while (i < pairs.size())
         if (pairs[i].first->getType() == BaseTerm::TT_FUNCTION &&
             pairs[i].second->getType() == BaseTerm::TT_FUNCTION)
         {
-            auto& t1 = pairs[i].first;
-            auto& t2 = pairs[i].second;
+            auto t1 = pairs[i].first;
+            auto t2 = pairs[i].second;
 
             if (t1->getSymbol() != t2->getSymbol() || t1->getOperands().size() != t2->getOperands().size()) {
                 collision = true;
                 return false;
             }
 
-            for (unsigned j = 0; j < t1->getOperands().size(); j++)
-                pairs.push_back({ t1->getOperands()[j], t2->getOperands()[j] });
+            for (unsigned j = 0; j < t1->getOperands().size(); j++) {
+                pairs.push_back({ t1->getOperands()[j], t2->getOperands()[j]});
+            }
 
             std::swap(pairs[i], pairs.back());
             pairs.pop_back();
@@ -71,12 +76,14 @@ bool decomposition(TermPairs& pairs, bool& collision) {
 }
 
 bool application(TermPairs& pairs, bool& cycle) {
+    // cout << "application" << endl;
+
     bool change = false;
     for (unsigned i = 0; i < pairs.size(); i++)
         if (pairs[i].first->getType() == BaseTerm::TT_VARIABLE) {
             auto& v = pairs[i].first->getVariable();
             auto& t = pairs[i].second;
-
+            
             if (contains(t, v)) {
                 cycle = true;
                 return false;
@@ -105,12 +112,13 @@ bool unify(const TermPairs& pairs, Substitution& s) {
     bool repeat = true;
     bool cycle = false;
     bool collision = false;
-    while (repeat && !cycle && !collision)
+    while (repeat && !cycle && !collision) {
         repeat = factorization(result)
         || tautology(result)
         || orientation(result)
         || decomposition(result, cycle)
         || application(result, collision);
+    }
 
     if (cycle || collision)
         return false;

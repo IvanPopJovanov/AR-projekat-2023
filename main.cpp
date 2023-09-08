@@ -1,5 +1,6 @@
 #include "fol.hpp"
 #include "Rewrite.h"
+#include "Completion.h"
 
 extern int yyparse();
 
@@ -9,41 +10,19 @@ extern Formula parsed_formula;
 
 int main()
 {
-  int n;
-  cin >> n;
-
-  RewriteSystem R;
-
-  for(int i = 0; i < n; i++) {
-    yyparse();
-    
-    if(parsed_formula.get() != 0 && parsed_formula->getType() == BaseFormula::T_ATOM)
-      R.eqs.push_back(parsed_formula);
-  }
-
-  Term t;
-  yyparse();
-  if(parsed_formula.get() != 0 && parsed_formula->getType() == BaseFormula::T_ATOM)
-    t = parsed_formula->getOperands()[0];
+  vector<Formula> eqs;
   
-  cout << "{ " << R.eqs[0];
-  for(int i = 1; i < n; i++) {
-      cout << ", " << R.eqs[i];
+  while(!yyparse()) {
+    if(parsed_formula.get() != 0 && parsed_formula->getType() == BaseFormula::T_ATOM) {
+      eqs.push_back(parsed_formula);
+      cout << parsed_formula << endl;
+    }
   }
-  cout << " } " << endl;
-
-  cout << t << endl;
-
-  cout << R.rewrite(t) << endl;
+  cout << eqs.size() << endl;
+  KnuthBendix(eqs);
+  for(auto eq : eqs) {
+    cout << eq << ";" << endl;
+  }
 
   return 0;
 }
-
-/*
-4
-plus(zero,X) = X;
-plus(s(X),Y) = s(plus(X,Y));
-times(zero,x) = zero;
-times(s(X),Y) = plus(Y, times(X,Y));
-
-*/
