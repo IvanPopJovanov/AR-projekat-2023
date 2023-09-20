@@ -1,3 +1,4 @@
+ord(one,times,i);
 times(one,X) = X;
 times(i(X),X) = one;
 times(times(X,Y),Z) = times(X, times(Y,Z));

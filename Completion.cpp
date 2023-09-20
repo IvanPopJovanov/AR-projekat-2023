@@ -111,8 +111,7 @@ vector<CriticalPair*> criticalPairs(Formula eq1, Formula eq2)
 	return cps;
 }
 
-void KnuthBendix(vector<Formula>& eqs) {
-	vector<string> w = { "one", "times", "i" };
+void KnuthBendix(vector<Formula>& eqs, vector<string> w) {
 	list<CriticalPair*> def;
 	queue<CriticalPair*> cps;
 
