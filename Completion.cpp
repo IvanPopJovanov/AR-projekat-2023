@@ -87,7 +87,6 @@ vector<CriticalPair*> criticalPairs(Formula eq1, Formula eq2)
 	overlaps(l1, l2, r2, substitutions, l1_cases);
 	for (int i = 0; i < substitutions.size(); i++) {
 		auto s = substitutions[i];
-
 		CriticalPair *cp = new CriticalPair(s.substitute(r1), s.substitute(l1_cases[i]));
 		cps.push_back(cp);
 	}
@@ -117,7 +116,7 @@ void KnuthBendix(vector<Formula>& eqs) {
 	list<CriticalPair*> def;
 	queue<CriticalPair*> cps;
 
-	cout << eqs.size() << " equations, " << cps.size() << " critical pairs, " << def.size() << " deffered" << endl;
+	// cout << eqs.size() << " equations, " << cps.size() << " critical pairs, " << def.size() << " deffered" << endl;
 
 	for(int i = 0; i < eqs.size(); i++) {
 		if(LPO_ge(eqs[i]->getRightOperand(), eqs[i]->getLeftOperand(), w)) {
@@ -133,41 +132,36 @@ void KnuthBendix(vector<Formula>& eqs) {
 		}
 	}
 
-	int maxi = 10;
 	while(!def.empty() || !cps.empty()) {
-		cout << eqs.size() << " equations, " << cps.size() << " critical pairs, " << def.size() << " deffered" << endl;
+		// cout << eqs.size() << " equations, " << cps.size() << " critical pairs, " << def.size() << " deffered" << endl;
 		if(!cps.empty()){
 			auto cp = cps.front();
 			cps.pop();
 			auto u1 = cp->l;
 			auto u2 = cp->r;
 
-			cout << u1 << " #1# " << u2 << endl;
 			RewriteSystem R;
 			R.eqs = eqs;
 			u1 = R.rewrite(u1);
 			u2 = R.rewrite(u2);
-			cout << u1 << " #2# " << u2 << endl;
 			if(u1 == u2)
 				continue;
 
 			Formula eq;
-			if(LPO_gt(u1, u2, w))
+			if(LPO_ge(u1, u2, w))
 				eq = FormulaDatabase::getFormulaDatabase().makeEquality(u1,u2);
-			else if(LPO_gt(u2, u1, w))
+			else if(LPO_ge(u2, u1, w))
 				eq = FormulaDatabase::getFormulaDatabase().makeEquality(u2,u1);
 			else {
 				def.push_back(cp);
 				continue;
 			}
 
-			// cout << eq << endl;
-			eqs.push_back(eq);
+			eqs.insert(eqs.begin(), eq);
 
 			for(int i = 0; i < eqs.size(); i++) {
-				auto tcps = criticalPairs(eqs[i], eq);
+				auto tcps = criticalPairs(eq, eqs[i]);
 				for(auto cp : tcps) {
-					// cout << cp->l << " ### " << cp->r << endl;	
 					cps.push(cp);
 				}
 			}
@@ -181,27 +175,47 @@ void KnuthBendix(vector<Formula>& eqs) {
 				R.eqs = eqs;
 				u1 = R.rewrite(u1);
 				u2 = R.rewrite(u2);
-				if(u1 == u2)
-					continue;
 
 				Formula eq;
-				if(LPO_gt(u1, u2, w))
+				if(LPO_ge(u1, u2, w))
 					eq = FormulaDatabase::getFormulaDatabase().makeEquality(u1,u2);
-				else if(LPO_gt(u2, u1, w))
+				else if(LPO_ge(u2, u1, w))
 					eq = FormulaDatabase::getFormulaDatabase().makeEquality(u2,u1);
 				else {
 					++it;
 					continue;
 				}
 				
-				it = def.erase(it);
 				cps.push(cp);
+				it = def.erase(it);
 			}
 		}
-
-		if(--maxi <= 0)
-			break;
 	}
 	
-	cout << eqs.size() << " equations, " << cps.size() << " critical pairs, " << def.size() << " deffered" << endl;
+	// cout << eqs.size() << " equations, " << cps.size() << " critical pairs, " << def.size() << " deffered" << endl;
+}
+
+
+void interreduce(vector<Formula>& eqs) {
+
+	for(auto it=eqs.begin(); it!=eqs.end(); ) {
+		auto l = (*it)->getLeftOperand();
+		auto r = (*it)->getRightOperand();
+
+		RewriteSystem R;
+		R.eqs = eqs;
+		auto r1 = R.rewrite(r);
+
+		it = eqs.erase(it);
+
+		R.eqs = eqs;
+		auto l1 = R.rewrite(l);
+
+		if(l == l1) {
+			Formula eq = FormulaDatabase::getFormulaDatabase().makeEquality(l,r);
+			it = eqs.insert(it, eq);
+			++it;
+		} 
+
+	}
 }

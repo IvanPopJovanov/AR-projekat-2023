@@ -29,9 +29,9 @@ bool LPO_gt(Term a, Term b, const vector<string>& weights)
         }
         for (auto f : weights) {
             if (f == a->getSymbol())
-                return true;
-            if (f == b->getSymbol())
                 return false;
+            if (f == b->getSymbol())
+                return true;
         }
     }
 
