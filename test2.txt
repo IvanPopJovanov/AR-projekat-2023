@@ -1,0 +1,2 @@
+ord(one, times, i);
+times(i(A),times(A,B)) = B;
