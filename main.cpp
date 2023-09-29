@@ -29,7 +29,11 @@ int main()
   }
   cout << endl;
   cout << eqs.size() << " input equations. " << endl;
-  KnuthBendix(eqs, w);
+  bool success = KnuthBendix(eqs, w);
+  if(!success) {
+    cout << "Knuth-Bendix procedure: FAIL" << endl;
+    return 0;
+  }
   cout << eqs.size() << " equations after completion. " << endl;
   interreduce(eqs);
   cout << eqs.size() << " equations after interreduction. " << endl;

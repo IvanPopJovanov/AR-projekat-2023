@@ -111,7 +111,7 @@ vector<CriticalPair*> criticalPairs(Formula eq1, Formula eq2)
 	return cps;
 }
 
-void KnuthBendix(vector<Formula>& eqs, vector<string> w) {
+bool KnuthBendix(vector<Formula>& eqs, vector<string> w) {
 	list<CriticalPair*> def;
 	queue<CriticalPair*> cps;
 
@@ -165,6 +165,7 @@ void KnuthBendix(vector<Formula>& eqs, vector<string> w) {
 				}
 			}
 		} else {
+			int def_size = def.size();
 			for(auto it=def.begin(); it!=def.end(); ) {
 				auto cp = *it;
 				auto u1 = cp->l;
@@ -188,10 +189,13 @@ void KnuthBendix(vector<Formula>& eqs, vector<string> w) {
 				cps.push(cp);
 				it = def.erase(it);
 			}
+			if(def_size == def.size()) 
+				return 0;
 		}
 	}
 	
 	// cout << eqs.size() << " equations, " << cps.size() << " critical pairs, " << def.size() << " deffered" << endl;
+	return 1;
 }
 
 
